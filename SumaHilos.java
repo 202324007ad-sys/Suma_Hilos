@@ -1,57 +1,81 @@
 package Hilo_Ejercicio1;
 
-import java.util.Random; //Libreria para generar numeros aleatorios
+import java.util.Random;
 
 public class SumaHilos {
 
     public static void main(String[] args) {
-        //Instancia de la clase Random
         Random numAle = new Random();
-
-        //Declarar variables
-        int ng1, ng2;
-        int suma_h1, suma_h2;
-
-        //Generar números aleatorios
-        ng1 = numAle.nextInt(150) + 1; //Se le agrega +1 porque si no comenzara a generar los numeros de 0 a 149
-        ng2 = numAle.nextInt(150) + 1;
+        
+        // Generar números aleatorios
+        int ng1 = numAle.nextInt(150) + 1;
+        int ng2 = numAle.nextInt(150) + 1;
 
         System.out.println("El numero generado para h1 es: " + ng1);
         System.out.println("El numero generado para h2 es: " + ng2);
-        System.out.println("");
 
-        // Proceso de h1
-        if (ng1 >= 1 && ng1 <= 100) {
-            System.out.println("Proceso generado por h1");
-            suma_h1 = 0;
-            int i = 1;
-            while (i <= ng1) {
-                suma_h1 = suma_h1 + i;
-                i = i + 1;
-            }
-            System.out.println("La suma de 1 hasta " + ng1 + " es: " + suma_h1);
-        } else {
-            System.out.println("La suma no puede ser generada por h1, ya que " + ng1 + " esta fuera del rango (1-100)");
+        // Crear e iniciar los hilos
+        Thread hilo1 = new HiloSuma(ng1, "h1");
+        Thread hilo2 = new HiloSuma(ng2, "h2");
+        
+        hilo1.start();
+        hilo2.start();
+        
+        // Esperar a que ambos hilos terminen
+        try {
+            hilo1.join();
+            hilo2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-
-        System.out.println("");
-
-        // Proceso de h2
-        if (ng2 >= 100 && ng2 <= 150) {
-            System.out.println("Proceso generado por h2");
-            suma_h2 = 0;
-            int j = 100;
-            while (j <= ng2) {
-                suma_h2 = suma_h2 + j;
-                j = j + 1;
+        
+        System.out.println("Ambos hilos han terminado su ejecución");
+    }
+    
+    // Clase interna que representa un hilo de suma
+    static class HiloSuma extends Thread {
+        private int numero;
+        private String nombreHilo;
+        
+        public HiloSuma(int numero, String nombreHilo) {
+            this.numero = numero;
+            this.nombreHilo = nombreHilo;
+        }
+        
+        @Override
+        public void run() {
+            if (nombreHilo.equals("h1")) {
+                // Proceso de h1
+                if (numero >= 1 && numero <= 100) {
+                    System.out.println("Proceso generado por " + nombreHilo);
+                    int suma = 0;
+                    for (int i = 1; i <= numero; i++) {
+                        suma += i;
+                    }
+                    System.out.println("La suma de 1 hasta " + numero + " es: " + suma);
+                } else {
+                    System.out.println("La suma no puede ser generada por " + nombreHilo + 
+                                     ", ya que " + numero + " esta fuera del rango (1-100)");
+                }
+            } else if (nombreHilo.equals("h2")) {
+                // Proceso de h2
+                if (numero >= 100 && numero <= 150) {
+                    System.out.println("Proceso generado por " + nombreHilo);
+                    int suma = 0;
+                    for (int j = 100; j <= numero; j++) {
+                        suma += j;
+                    }
+                    if (numero == 100) {
+                        System.out.println("La suma total es: " + suma);
+                    } else {
+                        System.out.println("La suma de 100 hasta " + numero + " es: " + suma);
+                    }
+                } else {
+                    System.out.println("La suma no puede ser generada por " + nombreHilo + 
+                                     " ya que " + numero + " esta fuera del rango (100-150)");
+                }
             }
-            if (ng2 == 100) {
-                System.out.println("La suma total es: " + suma_h2);
-            } else {
-                System.out.println("La suma de 100 hasta " + ng2 + " es: " + suma_h2);
-            }
-        } else {
-            System.out.println("La suma no puede ser generada por h2 ya que " + ng2 + " esta fuera del rango (100-150)");
+            System.out.println("");
         }
     }
 }
